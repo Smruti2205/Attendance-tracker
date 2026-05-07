@@ -11,4 +11,7 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(3000, () => console.log('Server running on port 3000'));
+server.listen(3000, () => {
+  console.log("\x1b[32mServer running on port 3000\x1b[0m");
+  console.log("\x1b[36mhttp://localhost:3000\x1b[0m");
+});

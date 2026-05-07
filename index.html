@@ -3,345 +3,1410 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Attendance Tracker System</title>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
-
+<title>Attendance Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
+/* ─── THEMES ─────────────────────────────────────────── */
+:root[data-theme="dark"] {
+  --bg: #0b0f1a;
+  --surface: #131929;
+  --surface2: #1c2438;
+  --surface3: #243048;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --text: #e8eeff;
+  --text2: #a0aec8;
+  --muted: #5d6e8f;
+  --accent: #5b8df7;
+  --accent-soft: rgba(91,141,247,0.12);
+  --green: #28d473;
+  --green-soft: rgba(40,212,115,0.12);
+  --red: #f4564b;
+  --red-soft: rgba(244,86,75,0.12);
+  --amber: #f5a623;
+  --amber-soft: rgba(245,166,35,0.12);
+  --shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+:root[data-theme="light"] {
+  --bg: #f0f4ff;
+  --surface: #ffffff;
+  --surface2: #f5f7ff;
+  --surface3: #eef0fa;
+  --border: rgba(0,0,0,0.07);
+  --border2: rgba(0,0,0,0.12);
+  --text: #1a2040;
+  --text2: #4a5578;
+  --muted: #8892b0;
+  --accent: #3d6ff0;
+  --accent-soft: rgba(61,111,240,0.1);
+  --green: #16a24a;
+  --green-soft: rgba(22,162,74,0.1);
+  --red: #dc2626;
+  --red-soft: rgba(220,38,38,0.1);
+  --amber: #d97706;
+  --amber-soft: rgba(217,119,6,0.1);
+  --shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+:root[data-theme="warm"] {
+  --bg: #1a1208;
+  --surface: #231a0d;
+  --surface2: #2d2212;
+  --surface3: #3a2c18;
+  --border: rgba(255,220,120,0.08);
+  --border2: rgba(255,220,120,0.15);
+  --text: #fef3d8;
+  --text2: #c9a96e;
+  --muted: #7a6040;
+  --accent: #f5a623;
+  --accent-soft: rgba(245,166,35,0.12);
+  --green: #7ec87e;
+  --green-soft: rgba(126,200,126,0.12);
+  --red: #f4754b;
+  --red-soft: rgba(244,117,75,0.12);
+  --amber: #f5cd23;
+  --amber-soft: rgba(245,205,35,0.12);
+  --shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+:root[data-theme="mint"] {
+  --bg: #061613;
+  --surface: #0c211e;
+  --surface2: #122c28;
+  --surface3: #183832;
+  --border: rgba(100,255,200,0.07);
+  --border2: rgba(100,255,200,0.14);
+  --text: #d8fff4;
+  --text2: #7ab8a6;
+  --muted: #3a6e5e;
+  --accent: #2de89a;
+  --accent-soft: rgba(45,232,154,0.12);
+  --green: #2de89a;
+  --green-soft: rgba(45,232,154,0.12);
+  --red: #f4564b;
+  --red-soft: rgba(244,86,75,0.12);
+  --amber: #f5d023;
+  --amber-soft: rgba(245,208,35,0.12);
+  --shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { transition: background 0.3s, color 0.3s; }
+
 body {
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-  margin:0;
-  color:#fff;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding-bottom: 80px;
+  transition: background 0.3s, color 0.3s;
 }
 
-.container { max-width:950px; margin:auto; padding:20px; }
+/* ─── HEADER ─────────────────────────────────────────── */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 60px;
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow);
+}
+.header-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: -0.5px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.logo-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+.header-right { display: flex; align-items: center; gap: 8px; }
+.theme-switcher {
+  display: flex;
+  gap: 4px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 999px;
+  padding: 3px;
+}
+.theme-btn {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.theme-btn:hover { transform: scale(1.1); }
+.theme-btn.active { border-color: var(--text); }
+.theme-btn[data-theme="dark"] { background: linear-gradient(135deg,#0b0f1a,#5b8df7); }
+.theme-btn[data-theme="light"] { background: linear-gradient(135deg,#f0f4ff,#3d6ff0); }
+.theme-btn[data-theme="warm"] { background: linear-gradient(135deg,#231a0d,#f5a623); }
+.theme-btn[data-theme="mint"] { background: linear-gradient(135deg,#061613,#2de89a); }
+.target-chip {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--accent-soft);
+  border: 1px solid rgba(91,141,247,0.25);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--accent);
+  transition: background 0.2s;
+  font-family: 'DM Mono', monospace;
+}
+.target-chip:hover { background: rgba(91,141,247,0.2); }
 
+/* ─── NAV ─────────────────────────────────────────────── */
+.nav-bar {
+  display: flex;
+  gap: 2px;
+  padding: 0 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.nav-bar::-webkit-scrollbar { display: none; }
+.nav-tab {
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  border: none;
+  background: none;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  white-space: nowrap;
+  font-family: 'DM Sans', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.nav-tab:hover { color: var(--text2); }
+.nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.nav-badge {
+  background: var(--red);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 99px;
+  min-width: 16px;
+  text-align: center;
+}
+
+/* ─── LAYOUT ─────────────────────────────────────────── */
+.container { max-width: 1020px; margin: 0 auto; padding: 20px 20px; }
+.tab-panel { display: none; animation: fadeIn 0.2s ease; }
+.tab-panel.active { display: block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+
+/* ─── CARDS ──────────────────────────────────────────── */
 .card {
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(10px);
-  padding:20px;
-  border-radius:15px;
-  margin:10px 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 14px;
+  transition: background 0.3s, border-color 0.3s;
+}
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.card-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
 }
 
-input,select {
-  padding:10px;
-  margin:5px;
-  border:none;
-  border-radius:8px;
-  background: rgba(255,255,255,0.15);
-  color:white;
-  min-width:120px;
+/* ─── STAT GRID ──────────────────────────────────────── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, border-color 0.2s;
+}
+.stat-card:hover { transform: translateY(-2px); border-color: var(--border2); }
+.stat-icon { font-size: 22px; margin-bottom: 8px; }
+.stat-val { font-family: 'DM Mono', monospace; font-size: 28px; font-weight: 500; line-height: 1; }
+.stat-lbl { font-size: 12px; color: var(--muted); margin-top: 4px; font-weight: 500; }
+.stat-card.blue .stat-val { color: var(--accent); }
+.stat-card.green .stat-val { color: var(--green); }
+.stat-card.red .stat-val { color: var(--red); }
+.stat-card.amber .stat-val { color: var(--amber); }
+
+/* ─── FORMS ──────────────────────────────────────────── */
+.form-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+input, select, textarea {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 9px 12px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+input:focus, select:focus { border-color: var(--accent); }
+input::placeholder { color: var(--muted); }
+select { appearance: none; cursor: pointer; }
+select option { background: var(--surface2); color: var(--text); }
+
+.btn {
+  padding: 9px 16px;
+  border: none;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.btn:active { transform: scale(0.96); }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { filter: brightness(1.1); }
+.btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border2); }
+.btn-ghost:hover { border-color: var(--accent); }
+.btn-green { background: var(--green-soft); color: var(--green); border: 1px solid rgba(40,212,115,0.25); }
+.btn-green:hover { background: rgba(40,212,115,0.2); }
+.btn-red { background: var(--red-soft); color: var(--red); border: 1px solid rgba(244,86,75,0.25); }
+.btn-red:hover { background: rgba(244,86,75,0.2); }
+.btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
+.btn-icon { padding: 7px; border-radius: 8px; }
+
+/* ─── TOOLBAR ─────────────────────────────────────────── */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.toolbar-left, .toolbar-right { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.search-wrap { position: relative; }
+.search-wrap input { padding-left: 34px; width: 200px; }
+.search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+
+/* ─── SUBJECT CARD ────────────────────────────────────── */
+.subject-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 10px;
+  transition: border-color 0.2s, transform 0.2s, background 0.3s;
+}
+.subject-card:hover { border-color: var(--border2); }
+.subj-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+.subj-name { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; }
+.subj-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.pct-ring { position: relative; width: 58px; height: 58px; flex-shrink: 0; }
+.pct-ring canvas { position: absolute; top: 0; left: 0; }
+.pct-val {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px; font-weight: 500;
+}
+.pct-val.good { color: var(--green); }
+.pct-val.warn { color: var(--amber); }
+.pct-val.bad { color: var(--red); }
+.progress-bar {
+  height: 5px;
+  background: var(--surface3);
+  border-radius: 99px;
+  overflow: visible;
+  position: relative;
+  margin: 10px 0 8px;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.5s ease;
+  position: relative;
+}
+.progress-fill.good { background: var(--green); }
+.progress-fill.warn { background: var(--amber); }
+.progress-fill.bad { background: var(--red); }
+.target-tick {
+  position: absolute;
+  top: -3px;
+  width: 2px; height: 11px;
+  background: var(--text2);
+  border-radius: 1px;
+  transform: translateX(-50%);
+}
+.subj-meta { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+.subj-counts { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); }
+.subj-pill {
+  font-size: 11px; font-weight: 700;
+  padding: 3px 10px; border-radius: 99px;
+}
+.subj-pill.safe { background: var(--green-soft); color: var(--green); border: 1px solid rgba(40,212,115,0.2); }
+.subj-pill.close { background: var(--amber-soft); color: var(--amber); border: 1px solid rgba(245,166,35,0.2); }
+.subj-pill.danger { background: var(--red-soft); color: var(--red); border: 1px solid rgba(244,86,75,0.2); }
+.subj-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.edit-section { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+.edit-section.open { display: block; }
+.log-section { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+.log-section.open { display: block; }
+.log-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 0; border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.log-row:last-child { border-bottom: none; }
+.log-date { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
+.log-badge { padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 700; }
+.log-badge.present { background: var(--green-soft); color: var(--green); }
+.log-badge.absent { background: var(--red-soft); color: var(--red); }
+
+/* ─── TIMETABLE ──────────────────────────────────────── */
+.timetable-grid {
+  display: grid;
+  grid-template-columns: 70px repeat(7, 1fr);
+  gap: 4px;
+  font-size: 12px;
+}
+.tt-header {
+  background: var(--surface2);
+  border-radius: 6px;
+  padding: 8px 4px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.tt-header.today { background: var(--accent-soft); color: var(--accent); }
+.tt-time {
+  padding: 8px 4px;
+  text-align: right;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.tt-cell {
+  min-height: 44px;
+  border-radius: 6px;
+  background: var(--surface2);
+  border: 1px dashed var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 18px;
+}
+.tt-cell:hover { background: var(--surface3); }
+.tt-slot {
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  min-height: 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: filter 0.15s, transform 0.15s;
+}
+.tt-slot:hover { filter: brightness(1.1); transform: scale(1.02); }
+.tt-slot-name { font-weight: 700; margin-bottom: 2px; }
+.tt-slot-time { opacity: 0.7; font-size: 10px; font-family: 'DM Mono', monospace; }
+.tt-del { position: absolute; top: 4px; right: 4px; font-size: 10px; opacity: 0; transition: opacity 0.2s; cursor: pointer; background: rgba(0,0,0,0.3); border-radius: 3px; padding: 1px 4px; color: #fff; border: none; }
+.tt-slot:hover .tt-del { opacity: 1; }
+.slot-colors {
+  display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+}
+.color-dot { width: 20px; height: 20px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: border-color 0.15s, transform 0.15s; }
+.color-dot:hover { transform: scale(1.2); }
+.color-dot.selected { border-color: var(--text); }
+
+/* ─── MARK TODAY ─────────────────────────────────────── */
+.mark-subject-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  transition: border-color 0.2s;
+}
+.mark-subject-card.done-present { border-color: rgba(40,212,115,0.3); background: var(--green-soft); }
+.mark-subject-card.done-absent { border-color: rgba(244,86,75,0.3); background: var(--red-soft); }
+.mark-quick { display: flex; gap: 6px; align-items: center; }
+.mark-btn {
+  padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600;
+  border: 1px solid var(--border2); background: var(--surface2); color: var(--text2);
+  cursor: pointer; transition: all 0.15s; font-family: 'DM Sans', sans-serif;
+}
+.mark-btn:hover { border-color: var(--border); }
+.mark-btn.active-present { background: var(--green-soft); border-color: var(--green); color: var(--green); }
+.mark-btn.active-absent { background: var(--red-soft); border-color: var(--red); color: var(--red); }
+.date-nav { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.day-chip {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-family: 'DM Mono', monospace;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
 }
 
-input::placeholder { color:rgba(255,255,255,0.7); }
+/* ─── ANALYTICS ──────────────────────────────────────── */
+.analytics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+.chart-wrap { height: 260px; }
+.analytics-table { width: 100%; border-collapse: collapse; }
+.analytics-table th { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+.analytics-table td { padding: 10px; border-bottom: 1px solid var(--border); font-size: 13px; }
+.analytics-table tr:last-child td { border-bottom: none; }
+.analytics-table tr:hover td { background: var(--surface2); }
+.risk-chip { padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+.risk-safe { background: var(--green-soft); color: var(--green); }
+.risk-warn { background: var(--amber-soft); color: var(--amber); }
+.risk-crit { background: var(--red-soft); color: var(--red); }
 
-select { appearance:none; }
-
-select option {
-  background:#1e1e1e;
-  color:white;
+/* ─── NOTIFICATIONS ──────────────────────────────────── */
+.notif-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
 }
-
-button {
-  padding:8px 12px;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-  color:white;
-  font-weight:600;
+.notif-row:last-child { border-bottom: none; }
+.notif-icon { font-size: 22px; flex-shrink: 0; }
+.notif-text { font-size: 14px; }
+.notif-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.notif-time { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; margin-left: auto; flex-shrink: 0; }
+.toggle-wrap { display: flex; align-items: center; gap: 10px; }
+.toggle {
+  width: 42px; height: 24px;
+  border-radius: 999px;
+  background: var(--surface3);
+  border: 1px solid var(--border2);
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s;
 }
-
-.add { background:#00c853; }
-.delete { background:#ff1744; }
-.edit { background:#2979ff; }
-.export { background:#ff9100; }
-
-.progress { height:10px; background:#444; border-radius:5px; }
-.bar { height:100%; border-radius:5px; }
-.good { background:#00e676; }
-.low { background:#ff5252; }
-
-.stats { display:flex; gap:10px; }
-
-.stat {
-  flex:1;
-  background: rgba(255,255,255,0.1);
-  padding:10px;
-  border-radius:10px;
-  text-align:center;
+.toggle.on { background: var(--accent); border-color: var(--accent); }
+.toggle-thumb {
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.2s;
 }
+.toggle.on .toggle-thumb { transform: translateX(18px); }
 
-.stat h3 { color:#00e5ff; }
-.stat p { color:#ccc; }
-
-canvas {
-  background: rgba(255,255,255,0.1);
-  border-radius:10px;
-  padding:10px;
-  margin-top:10px;
-  height:300px !important;
+/* ─── MODAL ──────────────────────────────────────────── */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; align-items: center; justify-content: center; }
+.overlay.open { display: flex; }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 18px;
+  padding: 24px;
+  max-width: 420px;
+  width: 92%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow);
 }
+.modal h3 { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+.modal input, .modal select { width: 100%; margin-bottom: 10px; }
+label { font-size: 13px; color: var(--text2); margin-bottom: 4px; display: block; font-weight: 600; }
 
-.dark {
-  background: linear-gradient(135deg,#000,#111);
+/* ─── TOAST ──────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 13px; font-weight: 500;
+  z-index: 999; opacity: 0;
+  transform: translateY(8px);
+  transition: all 0.25s;
+  pointer-events: none;
+  max-width: 280px;
+  box-shadow: var(--shadow);
 }
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.success { border-left: 3px solid var(--green); }
+.toast.error { border-left: 3px solid var(--red); }
+.toast.info { border-left: 3px solid var(--accent); }
 
-.warning { color:#ff5252; }
+/* ─── EMPTY ──────────────────────────────────────────── */
+.empty { text-align: center; padding: 48px 20px; color: var(--muted); }
+.empty h3 { font-family: 'Syne', sans-serif; font-size: 16px; margin-bottom: 8px; opacity: 0.7; }
+.empty p { font-size: 13px; }
 
-#toast {
-  position:fixed;
-  bottom:20px;
-  right:20px;
-  background:#333;
-  padding:10px;
-  border-radius:8px;
-  display:none;
+/* ─── MISC ───────────────────────────────────────────── */
+.section-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.streak-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 12px; font-weight: 700;
+  padding: 3px 10px; border-radius: 99px;
+  background: var(--amber-soft); color: var(--amber);
+  border: 1px solid rgba(245,166,35,0.2);
+}
+.divider { height: 1px; background: var(--border); margin: 14px 0; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.flex-gap { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.text-mono { font-family: 'DM Mono', monospace; }
+.text-muted { color: var(--muted); font-size: 13px; }
+.text-green { color: var(--green); }
+.text-red { color: var(--red); }
+.text-amber { color: var(--amber); }
+.text-accent { color: var(--accent); }
+
+@media (max-width: 640px) {
+  .analytics-grid { grid-template-columns: 1fr; }
+  .timetable-grid { grid-template-columns: 50px repeat(7, 1fr); gap: 2px; font-size: 10px; }
+  .header { padding: 0 14px; }
+  .container { padding: 14px; }
+  .nav-tab { padding: 10px 12px; font-size: 12px; }
+  .search-wrap input { width: 150px; }
 }
 </style>
 </head>
-
 <body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-logo">
+    <div class="logo-dot"></div>
+    Attendance Tracker
+  </div>
+  <div class="header-right">
+    <div class="theme-switcher">
+      <div class="theme-btn active" data-theme="dark" onclick="setTheme('dark')" title="Dark"></div>
+      <div class="theme-btn" data-theme="light" onclick="setTheme('light')" title="Light"></div>
+      <div class="theme-btn" data-theme="warm" onclick="setTheme('warm')" title="Warm"></div>
+      <div class="theme-btn" data-theme="mint" onclick="setTheme('mint')" title="Mint"></div>
+    </div>
+    <div class="target-chip" onclick="openModal('targetModal')">
+      🎯 <span id="targetDisplay">75</span>%
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav-bar">
+  <button class="nav-tab active" onclick="switchTab('subjects')">📚 Subjects</button>
+  <button class="nav-tab" onclick="switchTab('mark')">✅ Mark Today</button>
+  <button class="nav-tab" onclick="switchTab('timetable')">🗓 Timetable</button>
+  <button class="nav-tab" onclick="switchTab('analytics')">📈 Analytics</button>
+  <button class="nav-tab" onclick="switchTab('notifications')">🔔 Alerts <span id="notifBadge" class="nav-badge" style="display:none">0</span></button>
+</div>
 
 <div class="container">
 
-<h1 style="text-align:center;">📊 Attendance Tracker System</h1>
+  <!-- ── SUBJECTS ── -->
+  <div class="tab-panel active" id="tab-subjects">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Add Subject</div></div>
+      <div class="form-row">
+        <input id="inp-name" placeholder="Subject name" style="flex:2;min-width:120px">
+        <input id="inp-attended" type="number" min="0" placeholder="Attended" style="flex:1;min-width:80px">
+        <input id="inp-total" type="number" min="1" placeholder="Total" style="flex:1;min-width:80px">
+        <input id="inp-target" type="number" min="1" max="100" placeholder="Target% (opt)" style="flex:1;min-width:110px" title="Override global target">
+        <button class="btn btn-primary" onclick="addSubject()">+ Add</button>
+      </div>
+    </div>
 
-<div class="card">
-<input id="name" placeholder="Subject">
-<input id="attended" type="number" placeholder="Attended">
-<input id="total" type="number" placeholder="Total">
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <select id="sortSel" onchange="renderSubjects()">
+          <option value="">Sort: Default</option>
+          <option value="high">Highest %</option>
+          <option value="low">Lowest %</option>
+          <option value="name">A–Z</option>
+          <option value="risk">At Risk First</option>
+        </select>
+        <select id="filterSel" onchange="renderSubjects()">
+          <option value="">All Subjects</option>
+          <option value="safe">✅ Safe</option>
+          <option value="risk">⚠️ At Risk</option>
+        </select>
+      </div>
+      <div class="toolbar-right">
+        <div class="search-wrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input id="searchInput" placeholder="Search…" oninput="renderSubjects()">
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="exportCSV()">⬇ CSV</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportJSON()">⬇ JSON</button>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('importFile').click()">⬆ Import</button>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="handleImport(event)">
+      </div>
+    </div>
 
-<button class="add" onclick="add()">Add</button>
-<button onclick="toggleDark()">🌙</button>
+    <div class="stats-grid" id="statsGrid"></div>
+    <div id="subjectList"></div>
+  </div>
 
-<button class="export" onclick="downloadJSON()">JSON</button>
-<button class="export" onclick="downloadCSV()">CSV</button>
+  <!-- ── MARK TODAY ── -->
+  <div class="tab-panel" id="tab-mark">
+    <div class="card" style="margin-bottom:14px;">
+      <div class="flex-between" style="flex-wrap:wrap; gap:10px;">
+        <div class="date-nav">
+          <button class="btn btn-ghost btn-sm" onclick="shiftDate(-1)">‹</button>
+          <div class="day-chip" id="dateDisplay"></div>
+          <button class="btn btn-ghost btn-sm" onclick="shiftDate(1)">›</button>
+          <input type="date" id="markDate" onchange="renderMarkTab()" style="display:none">
+        </div>
+        <div style="color:var(--muted); font-family:'DM Mono',monospace; font-size:13px;" id="dayLabel"></div>
+        <div class="flex-gap">
+          <button class="btn btn-green btn-sm" onclick="markAll('present')">✅ All Present</button>
+          <button class="btn btn-red btn-sm" onclick="markAll('absent')">❌ All Absent</button>
+        </div>
+      </div>
+    </div>
+    <div id="markList"></div>
+    <div id="scheduledToday" style="margin-top:14px;"></div>
+  </div>
 
-<select onchange="changeTheme(this.value)">
-<option>Theme</option>
-<option value="blue">Blue</option>
-<option value="purple">Purple</option>
-<option value="dark">Dark</option>
-</select>
+  <!-- ── TIMETABLE ── -->
+  <div class="tab-panel" id="tab-timetable">
+    <div class="card" style="margin-bottom:14px;">
+      <div class="card-header"><div class="card-title">Weekly Timetable</div><button class="btn btn-primary btn-sm" onclick="openAddSlotModal()">+ Add Class</button></div>
+      <p class="text-muted" style="margin-bottom:14px;">Click a slot or use the button to schedule classes. Click on an existing class to delete it.</p>
+      <div style="overflow-x:auto;">
+        <div id="timetableGrid" class="timetable-grid"></div>
+      </div>
+    </div>
+    <div id="noTimetableMsg"></div>
+  </div>
 
-<select onchange="sortData(this.value)">
-<option>Sort</option>
-<option value="high">High→Low</option>
-<option value="low">Low→High</option>
-</select>
+  <!-- ── ANALYTICS ── -->
+  <div class="tab-panel" id="tab-analytics">
+    <div class="analytics-grid">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:10px;">Attendance Distribution</div>
+        <div class="chart-wrap"><canvas id="distChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:10px;">Classes Overview</div>
+        <div class="chart-wrap"><canvas id="compChart"></canvas></div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:14px;">
+      <div class="card-title" style="margin-bottom:12px;">Last 14 Days</div>
+      <div style="height:180px;"><canvas id="histChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="margin-bottom:12px;">Detailed Breakdown</div>
+      <div id="analyticsTable" style="overflow-x:auto;"></div>
+    </div>
+  </div>
+
+  <!-- ── NOTIFICATIONS ── -->
+  <div class="tab-panel" id="tab-notifications">
+    <div class="card" style="margin-bottom:14px;">
+      <div class="card-title" style="margin-bottom:12px;">Alert Settings</div>
+      <div class="notif-row">
+        <div class="notif-icon">⚠️</div>
+        <div>
+          <div class="notif-text">At-risk subject alerts</div>
+          <div class="notif-sub">Notify when attendance drops below target</div>
+        </div>
+        <div class="toggle-wrap" style="margin-left:auto;">
+          <div class="toggle on" id="toggle-risk" onclick="toggleNotif('risk')"><div class="toggle-thumb"></div></div>
+        </div>
+      </div>
+      <div class="notif-row">
+        <div class="notif-icon">📅</div>
+        <div>
+          <div class="notif-text">Timetable reminders</div>
+          <div class="notif-sub">Show today's scheduled classes on Mark tab</div>
+        </div>
+        <div class="toggle-wrap" style="margin-left:auto;">
+          <div class="toggle on" id="toggle-tt" onclick="toggleNotif('tt')"><div class="toggle-thumb"></div></div>
+        </div>
+      </div>
+      <div class="notif-row">
+        <div class="notif-icon">📊</div>
+        <div>
+          <div class="notif-text">Low attendance warning threshold</div>
+          <div class="notif-sub">Alert when within <strong id="warnThreshDisplay">5</strong>% of target</div>
+        </div>
+        <div style="margin-left:auto; display:flex; align-items:center; gap:8px;">
+          <input type="range" id="warnThreshSlider" min="1" max="15" value="5" style="width:80px; padding:0;" oninput="updateWarnThresh(this.value)">
+          <span class="text-mono" style="font-size:13px; min-width:28px; color:var(--amber);" id="warnThreshVal">5%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="margin-bottom:12px;">Current Alerts</div>
+      <div id="alertsList"></div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<!-- ── MODALS ── -->
+
+<!-- Target -->
+<div class="overlay" id="targetModal" onclick="if(event.target===this)closeModal('targetModal')">
+  <div class="modal">
+    <h3>🎯 Global Attendance Target</h3>
+    <p class="text-muted" style="margin-bottom:16px;">Applied to subjects without a custom target.</p>
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+      <input type="range" id="targetSlider" min="50" max="100" step="1" value="75" oninput="document.getElementById('targetPrev').textContent=this.value+'%'" style="flex:1; padding:0;">
+      <span id="targetPrev" class="text-mono text-accent" style="font-size:24px; font-weight:500; min-width:52px; text-align:right;">75%</span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('targetModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveTarget()">Save</button>
+    </div>
+  </div>
 </div>
 
-<input id="search" placeholder="Search..." onkeyup="search()">
-
-<div class="stats">
-<div class="stat"><h3 id="totalSub">0</h3><p>Subjects</p></div>
-<div class="stat"><h3 id="avg">0%</h3><p>Average</p></div>
+<!-- Add Slot -->
+<div class="overlay" id="slotModal" onclick="if(event.target===this)closeModal('slotModal')">
+  <div class="modal">
+    <h3>🗓 Add Class Slot</h3>
+    <label>Subject</label>
+    <select id="slot-subj" style="margin-bottom:10px;"></select>
+    <label>Day</label>
+    <select id="slot-day" style="margin-bottom:10px;">
+      <option value="0">Monday</option>
+      <option value="1">Tuesday</option>
+      <option value="2">Wednesday</option>
+      <option value="3">Thursday</option>
+      <option value="4">Friday</option>
+      <option value="5">Saturday</option>
+      <option value="6">Sunday</option>
+    </select>
+    <label>Time Slot</label>
+    <select id="slot-time" style="margin-bottom:10px;"></select>
+    <label>Color</label>
+    <div class="slot-colors" id="slotColorPicker"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('slotModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSlot()">Add Slot</button>
+    </div>
+  </div>
 </div>
 
-<select onchange="changeChart(this.value)">
-<option value="bar">Bar</option>
-<option value="line">Line</option>
-</select>
-
-<canvas id="chart"></canvas>
-
-<div id="list"></div>
-
+<!-- Edit Subject -->
+<div class="overlay" id="editModal" onclick="if(event.target===this)closeModal('editModal')">
+  <div class="modal">
+    <h3>✏️ Edit Subject</h3>
+    <input type="hidden" id="edit-idx">
+    <label>Name</label>
+    <input id="edit-name" placeholder="Subject name">
+    <label>Classes Attended</label>
+    <input id="edit-att" type="number" min="0">
+    <label>Total Classes</label>
+    <input id="edit-tot" type="number" min="1">
+    <label>Custom Target % (leave blank for global)</label>
+    <input id="edit-tgt" type="number" min="1" max="100" placeholder="e.g. 80">
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('editModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEditModal()">Save</button>
+    </div>
+  </div>
 </div>
 
-<div id="toast"></div>
+<div class="toast" id="toast"></div>
 
 <script>
-let subjects = JSON.parse(localStorage.getItem('subjects')||'[]');
-let chartType="bar";
-let chart;
+// ─── STATE ───────────────────────────────────────────
+let data = JSON.parse(localStorage.getItem('att_v3') || '[]');
+let globalTarget = parseInt(localStorage.getItem('att_target') || '75');
+let timetable = JSON.parse(localStorage.getItem('att_tt') || '[]');
+let notifSettings = JSON.parse(localStorage.getItem('att_notif') || '{"risk":true,"tt":true,"warnThresh":5}');
+let currentTheme = localStorage.getItem('att_theme') || 'dark';
+let markDate = new Date().toISOString().split('T')[0];
+let chartInsts = {};
+let selectedSlotColor = '#5b8df7';
 
-function notify(msg){
-  const t=document.getElementById("toast");
-  t.innerText=msg;
-  t.style.display="block";
-  setTimeout(()=>t.style.display="none",2000);
+const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const DAYS_SHORT = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const TIME_SLOTS = ['7:00','7:30','8:00','8:30','9:00','9:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00'];
+const SLOT_COLORS = ['#5b8df7','#7c3aed','#2de89a','#f5a623','#f4564b','#06b6d4','#ec4899','#8b5cf6','#f97316','#84cc16'];
+
+// ─── PERSIST ─────────────────────────────────────────
+function save() {
+  localStorage.setItem('att_v3', JSON.stringify(data));
+  localStorage.setItem('att_target', globalTarget);
+  localStorage.setItem('att_tt', JSON.stringify(timetable));
+  localStorage.setItem('att_notif', JSON.stringify(notifSettings));
+  localStorage.setItem('att_theme', currentTheme);
 }
 
-function render(data=subjects){
-  const list=document.getElementById("list");
-
-  if(data.length===0){
-    list.innerHTML="<p>No data</p>";
-    drawChart();
-    return;
+// ─── UTILS ────────────────────────────────────────────
+function pct(s) { return s.total ? (s.attended / s.total) * 100 : 0; }
+function getTarget(s) { return s.target ?? globalTarget; }
+function classify(s) {
+  const p = pct(s), t = getTarget(s);
+  if (p >= t) return 'good';
+  if (p >= t - notifSettings.warnThresh) return 'warn';
+  return 'bad';
+}
+function statusMsg(s) {
+  const p = pct(s), t = getTarget(s);
+  if (!s.total) return { text: 'No classes yet', cls: 'close' };
+  if (p >= t) {
+    const canMiss = Math.floor((s.attended - t/100*s.total) / (t/100));
+    return { text: `Can miss ${canMiss} class${canMiss!==1?'es':''}`, cls: 'safe' };
+  } else {
+    const needed = Math.ceil((t/100*s.total - s.attended) / (1 - t/100));
+    return { text: `Need ${needed} more`, cls: 'danger' };
   }
+}
+function toast(msg, type='success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + type;
+  setTimeout(() => el.className='toast', 2400);
+}
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
-  list.innerHTML=data.map((s,i)=>{
-    const pct=((s.attended/s.total)*100).toFixed(1);
-    const low=pct<75;
+// ─── THEME ───────────────────────────────────────────
+function setTheme(t) {
+  currentTheme = t;
+  document.documentElement.setAttribute('data-theme', t);
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b.dataset.theme===t));
+  save();
+}
+setTheme(currentTheme);
 
-    let needed=Math.ceil((0.75*s.total - s.attended)/(1-0.75));
-    let canMiss=Math.floor((s.attended - 0.75*s.total)/0.75);
+// ─── SUBJECTS TAB ─────────────────────────────────────
+function renderStats() {
+  const total = data.length;
+  const safe = data.filter(s => pct(s) >= getTarget(s)).length;
+  const atRisk = total - safe;
+  const avg = total ? (data.reduce((a,s)=>a+pct(s),0)/total) : 0;
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card blue"><div class="stat-icon">📚</div><div class="stat-val">${total}</div><div class="stat-lbl">Subjects</div></div>
+    <div class="stat-card green"><div class="stat-icon">✅</div><div class="stat-val">${safe}</div><div class="stat-lbl">Safe</div></div>
+    <div class="stat-card red"><div class="stat-icon">⚠️</div><div class="stat-val">${atRisk}</div><div class="stat-lbl">At Risk</div></div>
+    <div class="stat-card amber"><div class="stat-icon">📊</div><div class="stat-val">${avg.toFixed(1)}%</div><div class="stat-lbl">Average</div></div>
+  `;
+}
+function renderSubjects() {
+  renderStats();
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const sort = document.getElementById('sortSel').value;
+  const filter = document.getElementById('filterSel').value;
+  let list = data.filter(s => s.name.toLowerCase().includes(search));
+  if (filter==='safe') list = list.filter(s=>pct(s)>=getTarget(s));
+  if (filter==='risk') list = list.filter(s=>pct(s)<getTarget(s));
+  if (sort==='high') list.sort((a,b)=>pct(b)-pct(a));
+  else if (sort==='low') list.sort((a,b)=>pct(a)-pct(b));
+  else if (sort==='name') list.sort((a,b)=>a.name.localeCompare(b.name));
+  else if (sort==='risk') list.sort((a,b)=>pct(a)-pct(b));
 
-    let msg=low ? `⚠ Need ${needed} classes` : `😎 Can miss ${canMiss}`;
+  const el = document.getElementById('subjectList');
+  if (!data.length) { el.innerHTML='<div class="empty"><h3>No subjects yet</h3><p>Add your first subject above</p></div>'; return; }
+  if (!list.length) { el.innerHTML='<div class="empty"><h3>No results</h3><p>Try different search/filter</p></div>'; return; }
 
+  el.innerHTML = list.map(s => {
+    const idx = data.indexOf(s);
+    const p = pct(s), t = getTarget(s), cls = classify(s);
+    const msg = statusMsg(s);
+    const pCapped = Math.min(p, 100);
+    const log = (s.log||[]).slice(-5).reverse();
     return `
-    <div class="card">
-      <h3>${s.name} <span style="float:right">${pct}%</span></h3>
-      <p>${s.attended}/${s.total}</p>
-
-      <div class="progress">
-        <div class="bar ${low?'low':'good'}" style="width:${pct}%"></div>
+    <div class="subject-card">
+      <div class="subj-top">
+        <div style="flex:1">
+          <div class="subj-name">${s.name}</div>
+          <div class="subj-sub">${s.total} total classes${s.target!=null?' · Custom target: '+s.target+'%':''}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="text-mono" style="font-size:22px; font-weight:500; color:${cls==='good'?'var(--green)':cls==='warn'?'var(--amber)':'var(--red)'}">${p.toFixed(1)}%</div>
+          <div class="text-muted" style="font-size:11px;">target ${t}%</div>
+        </div>
       </div>
+      <div class="progress-bar">
+        <div class="progress-fill ${cls}" style="width:${pCapped}%"></div>
+        <div class="target-tick" style="left:${Math.min(t,100)}%"></div>
+      </div>
+      <div class="subj-meta">
+        <span class="subj-counts">${s.attended} / ${s.total} present</span>
+        <span class="subj-pill ${msg.cls}">${msg.text}</span>
+      </div>
+      <div class="subj-actions">
+        <button class="btn btn-green btn-sm" onclick="quickMark(${idx},'present')">✅ Present</button>
+        <button class="btn btn-red btn-sm" onclick="quickMark(${idx},'absent')">❌ Absent</button>
+        <button class="btn btn-ghost btn-sm" onclick="openEditModal(${idx})">✏️ Edit</button>
+        <button class="btn btn-ghost btn-sm" onclick="toggleLog(${idx})">📋 Log</button>
+        <button class="btn btn-red btn-sm" onclick="deleteSubject(${idx})">🗑</button>
+      </div>
+      <div class="log-section" id="log-${idx}">
+        <div class="section-label" style="margin-top:4px;">Recent Attendance Log</div>
+        ${log.length ? log.map(l=>`
+          <div class="log-row">
+            <span class="log-date">${l.date}</span>
+            <span class="log-badge ${l.status}">${l.status}</span>
+          </div>`).join('') : '<p class="text-muted">No log entries yet</p>'}
+      </div>
+    </div>`;
+  }).join('');
+  updateNotifBadge();
+}
+function addSubject() {
+  const name = document.getElementById('inp-name').value.trim();
+  const att = parseInt(document.getElementById('inp-attended').value);
+  const tot = parseInt(document.getElementById('inp-total').value);
+  const tgt = document.getElementById('inp-target').value;
+  if (!name) { toast('Enter a subject name','error'); return; }
+  if (isNaN(att)||isNaN(tot)||tot<1||att<0) { toast('Enter valid numbers','error'); return; }
+  if (att>tot) { toast('Attended cannot exceed total','error'); return; }
+  if (data.find(s=>s.name.toLowerCase()===name.toLowerCase())) { toast('Subject already exists','error'); return; }
+  const subj = {name,attended:att,total:tot,log:[]};
+  if (tgt) subj.target = parseInt(tgt);
+  data.push(subj);
+  save(); renderSubjects(); renderMarkTab();
+  ['inp-name','inp-attended','inp-total','inp-target'].forEach(id=>document.getElementById(id).value='');
+  toast(`"${name}" added ✅`);
+}
+function deleteSubject(i) {
+  if (!confirm(`Delete "${data[i].name}"?`)) return;
+  const name = data[i].name;
+  timetable = timetable.filter(s=>s.subj!==name);
+  data.splice(i,1);
+  save(); renderSubjects(); renderMarkTab(); renderTimetable();
+  toast('Deleted','error');
+}
+function quickMark(i, status) {
+  const today = new Date().toISOString().split('T')[0];
+  const s = data[i];
+  if (!s.log) s.log=[];
+  const existing = s.log.find(l=>l.date===today);
+  if (existing) {
+    if (existing.status===status) return;
+    if (existing.status==='present') s.attended--;
+    else s.attended++;
+    existing.status=status;
+  } else {
+    s.log.push({date:today,status});
+    s.total++;
+    if (status==='present') s.attended++;
+  }
+  save(); renderSubjects(); renderMarkTab();
+  toast(`${s.name}: ${status==='present'?'✅ Present':'❌ Absent'}`);
+}
+function toggleLog(i) {
+  const el = document.getElementById(`log-${i}`);
+  el.classList.toggle('open');
+}
+function openEditModal(i) {
+  const s = data[i];
+  document.getElementById('edit-idx').value=i;
+  document.getElementById('edit-name').value=s.name;
+  document.getElementById('edit-att').value=s.attended;
+  document.getElementById('edit-tot').value=s.total;
+  document.getElementById('edit-tgt').value=s.target||'';
+  openModal('editModal');
+}
+function saveEditModal() {
+  const i = parseInt(document.getElementById('edit-idx').value);
+  const name = document.getElementById('edit-name').value.trim();
+  const att = parseInt(document.getElementById('edit-att').value);
+  const tot = parseInt(document.getElementById('edit-tot').value);
+  const tgt = document.getElementById('edit-tgt').value;
+  if (!name||isNaN(att)||isNaN(tot)||att>tot||tot<1) { toast('Invalid values','error'); return; }
+  const oldName = data[i].name;
+  data[i].name=name; data[i].attended=att; data[i].total=tot;
+  data[i].target = tgt?parseInt(tgt):undefined;
+  if (oldName!==name) timetable.forEach(s=>{ if(s.subj===oldName) s.subj=name; });
+  save(); closeModal('editModal'); renderSubjects(); renderMarkTab(); renderTimetable();
+  toast('Saved ✅');
+}
 
-      <p class="${low?'warning':''}">${msg}</p>
-
-      <button class="edit" onclick="edit(${i})">Edit</button>
-      <button class="delete" onclick="del(${i})">Delete</button>
-    </div>
-    `;
+// ─── MARK TODAY ───────────────────────────────────────
+function updateDateDisplay() {
+  const d = new Date(markDate+'T00:00:00');
+  document.getElementById('dateDisplay').textContent = markDate;
+  const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  document.getElementById('dayLabel').textContent = dayNames[d.getDay()];
+}
+function shiftDate(delta) {
+  const d = new Date(markDate+'T00:00:00');
+  d.setDate(d.getDate()+delta);
+  markDate = d.toISOString().split('T')[0];
+  document.getElementById('markDate').value = markDate;
+  updateDateDisplay();
+  renderMarkTab();
+}
+function renderMarkTab() {
+  updateDateDisplay();
+  const el = document.getElementById('markList');
+  if (!data.length) { el.innerHTML='<div class="empty"><h3>No subjects yet</h3><p>Add subjects in the Subjects tab</p></div>'; return; }
+  el.innerHTML = data.map((s,i)=>{
+    const log = (s.log||[]).find(l=>l.date===markDate);
+    const status = log?log.status:null;
+    return `
+    <div class="mark-subject-card ${status?'done-'+status:''}">
+      <div>
+        <div style="font-weight:600; font-size:15px;">${s.name}</div>
+        <div class="text-muted" style="margin-top:2px;">${s.attended}/${s.total} — ${pct(s).toFixed(1)}% <span style="color:${pct(s)>=getTarget(s)?'var(--green)':'var(--red)'};">(${pct(s)>=getTarget(s)?'✅':'⚠️'} target ${getTarget(s)}%)</span></div>
+      </div>
+      <div class="mark-quick">
+        <button class="mark-btn ${status==='present'?'active-present':''}" onclick="markDay(${i},'present','${markDate}')">✅ Present</button>
+        <button class="mark-btn ${status==='absent'?'active-absent':''}" onclick="markDay(${i},'absent','${markDate}')">❌ Absent</button>
+        ${!status?'<span class="text-muted" style="font-size:12px;">Not marked</span>':''}
+      </div>
+    </div>`;
   }).join('');
 
-  updateStats();
-  drawChart();
-}
-
-function add(){
-  const name=nameInput.value;
-  const attended=parseInt(attendedInput.value);
-  const total=parseInt(totalInput.value);
-
-  if(!name||isNaN(attended)||isNaN(total)){
-    notify("Fill all fields"); return;
+  // Show scheduled for today
+  const sched = document.getElementById('scheduledToday');
+  if (!notifSettings.tt) { sched.innerHTML=''; return; }
+  const d = new Date(markDate+'T00:00:00');
+  const dayIdx = (d.getDay()+6)%7; // Mon=0
+  const todaySlots = timetable.filter(s=>s.day==dayIdx);
+  if (todaySlots.length) {
+    sched.innerHTML=`<div class="card"><div class="card-title" style="margin-bottom:10px;">📅 Scheduled Today</div>${todaySlots.map(s=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+        <div style="width:10px;height:10px;border-radius:50%;background:${s.color};flex-shrink:0;"></div>
+        <strong>${s.subj}</strong>
+        <span class="text-mono text-muted" style="font-size:12px;">${TIME_SLOTS[s.time]}</span>
+      </div>`).join('')}
+    </div>`;
+  } else {
+    sched.innerHTML='';
   }
-
-  subjects.push({name,attended,total});
-  save();
-  notify("Added ✅");
 }
-
-function edit(i){
-  const s=subjects[i];
-  nameInput.value=s.name;
-  attendedInput.value=s.attended;
-  totalInput.value=s.total;
-  del(i);
-}
-
-function del(i){
-  subjects.splice(i,1);
-  save();
-}
-
-function save(){
-  localStorage.setItem('subjects',JSON.stringify(subjects));
-  render();
-}
-
-function updateStats(){
-  totalSub.innerText=subjects.length;
-  let avg=0;
-  if(subjects.length){
-    avg=subjects.reduce((a,s)=>a+(s.attended/s.total*100),0)/subjects.length;
+function markDay(i, status, date) {
+  const s = data[i];
+  if (!s.log) s.log=[];
+  const existing = s.log.find(l=>l.date===date);
+  if (existing) {
+    if (existing.status===status) return;
+    if (existing.status==='present') s.attended--;
+    else s.attended++;
+    existing.status=status;
+  } else {
+    s.log.push({date,status});
+    s.total++;
+    if (status==='present') s.attended++;
   }
-  avgEl.innerText=avg.toFixed(1)+"%";
+  save(); renderMarkTab(); renderSubjects();
+  toast(`${s.name}: marked ${status}`);
 }
-
-function drawChart(){
-  const ctx=document.getElementById("chart").getContext("2d");
-
-  if(chart) chart.destroy();
-
-  chart=new Chart(ctx,{
-    type:chartType,
-    data:{
-      labels:subjects.map(s=>s.name),
-      datasets:[{
-        label:"Attendance %",
-        data:subjects.map(s=>(s.attended/s.total*100)),
-        backgroundColor:"rgba(0,229,255,0.3)",
-        borderColor:"#00e5ff",
-        pointBackgroundColor:"#00e5ff",
-        borderWidth:2,
-        tension:0.3
-      }]
-    },
-    options:{
-      responsive:true,
-      plugins:{
-        legend:{ labels:{ color:"white" } }
-      },
-      scales:{
-        x:{ ticks:{ color:"white" }},
-        y:{
-          min:0,
-          max:100,
-          ticks:{
-            color:"white",
-            callback:value=>value+"%"
-          }
-        }
-      }
-    }
+function markAll(status) {
+  data.forEach((_,i)=>{
+    const existing = (data[i].log||[]).find(l=>l.date===markDate);
+    if (!existing) markDay(i,status,markDate);
   });
 }
 
-function changeChart(t){ chartType=t; drawChart(); }
+// ─── TIMETABLE ────────────────────────────────────────
+function renderTimetable() {
+  const grid = document.getElementById('timetableGrid');
+  const today = new Date().getDay(); // 0=Sun
+  const todayMon = (today+6)%7; // Mon=0
 
-function search(){
-  const val=searchInput.value.toLowerCase();
-  render(subjects.filter(s=>s.name.toLowerCase().includes(val)));
+  // Headers
+  let html = '<div class="tt-header"></div>';
+  DAYS_SHORT.forEach((d,i)=>{
+    html+=`<div class="tt-header ${i===todayMon?'today':''}">${d}</div>`;
+  });
+  // Time rows
+  TIME_SLOTS.forEach((t,ti)=>{
+    html+=`<div class="tt-time">${t}</div>`;
+    for(let d=0;d<7;d++){
+      const slot = timetable.find(s=>s.day===d && s.time===ti);
+      if(slot){
+        const sidx = timetable.indexOf(slot);
+        html+=`<div class="tt-slot" style="background:${slot.color}22;border:1px solid ${slot.color}44;color:${slot.color}">
+          <div class="tt-slot-name">${slot.subj.length>12?slot.subj.slice(0,12)+'…':slot.subj}</div>
+          <div class="tt-slot-time">${t}</div>
+          <button class="tt-del" onclick="deleteSlot(${sidx})" title="Remove">✕</button>
+        </div>`;
+      } else {
+        html+=`<div class="tt-cell" onclick="openAddSlotModalAt(${d},${ti})" title="Add class">+</div>`;
+      }
+    }
+  });
+  grid.innerHTML=html;
+}
+function openAddSlotModal() {
+  populateSlotModal(-1,-1);
+  openModal('slotModal');
+}
+function openAddSlotModalAt(day,time) {
+  populateSlotModal(day,time);
+  openModal('slotModal');
+}
+function populateSlotModal(day,time) {
+  const subjSel = document.getElementById('slot-subj');
+  subjSel.innerHTML = data.length
+    ? data.map(s=>`<option value="${s.name}">${s.name}</option>`).join('')
+    : '<option disabled>No subjects added</option>';
+  if(day>=0) document.getElementById('slot-day').value=day;
+  const timeSel = document.getElementById('slot-time');
+  timeSel.innerHTML = TIME_SLOTS.map((t,i)=>`<option value="${i}">${t}</option>`).join('');
+  if(time>=0) timeSel.value=time;
+  // Color picker
+  selectedSlotColor = SLOT_COLORS[0];
+  document.getElementById('slotColorPicker').innerHTML = SLOT_COLORS.map(c=>`
+    <div class="color-dot ${c===selectedSlotColor?'selected':''}" style="background:${c};" onclick="selectSlotColor('${c}')" data-color="${c}"></div>
+  `).join('');
+}
+function selectSlotColor(c) {
+  selectedSlotColor=c;
+  document.querySelectorAll('.color-dot').forEach(d=>d.classList.toggle('selected',d.dataset.color===c));
+}
+function saveSlot() {
+  const subj = document.getElementById('slot-subj').value;
+  const day = parseInt(document.getElementById('slot-day').value);
+  const time = parseInt(document.getElementById('slot-time').value);
+  if(!subj) { toast('Select a subject','error'); return; }
+  if(timetable.find(s=>s.day===day&&s.time===time)) { toast('Slot already occupied','error'); return; }
+  timetable.push({subj,day,time,color:selectedSlotColor});
+  save(); closeModal('slotModal'); renderTimetable();
+  toast('Class slot added ✅');
+}
+function deleteSlot(i) {
+  timetable.splice(i,1);
+  save(); renderTimetable();
+  toast('Slot removed','error');
 }
 
-function sortData(type){
-  if(type==="high"){
-    subjects.sort((a,b)=>(b.attended/b.total)-(a.attended/a.total));
-  } else {
-    subjects.sort((a,b)=>(a.attended/a.total)-(b.attended/a.total));
+// ─── ANALYTICS ────────────────────────────────────────
+function renderAnalytics() {
+  renderDistChart(); renderCompChart(); renderHistChart(); renderAnalyticsTable();
+}
+function destroyChart(key) { if(chartInsts[key]) { chartInsts[key].destroy(); delete chartInsts[key]; } }
+function renderDistChart() {
+  destroyChart('dist');
+  const ctx = document.getElementById('distChart').getContext('2d');
+  if (!data.length) return;
+  chartInsts['dist'] = new Chart(ctx,{
+    type:'doughnut',
+    data:{
+      labels: data.map(s=>s.name),
+      datasets:[{
+        data: data.map(s=>parseFloat(pct(s).toFixed(1))),
+        backgroundColor: data.map(s=>classify(s)==='good'?'#28d473':classify(s)==='warn'?'#f5a623':'#f4564b'),
+        borderWidth:2, borderColor:'var(--surface)'
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.label}: ${c.parsed.toFixed(1)}%`}}}}
+  });
+}
+function renderCompChart() {
+  destroyChart('comp');
+  const ctx = document.getElementById('compChart').getContext('2d');
+  if (!data.length) return;
+  chartInsts['comp'] = new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels: data.map(s=>s.name.length>10?s.name.slice(0,10)+'…':s.name),
+      datasets:[
+        {label:'Attended',data:data.map(s=>s.attended),backgroundColor:'rgba(91,141,247,0.7)',borderColor:'#5b8df7',borderWidth:1,borderRadius:4},
+        {label:'Total',data:data.map(s=>s.total),backgroundColor:'rgba(124,58,237,0.3)',borderColor:'#7c3aed',borderWidth:1,borderRadius:4}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'var(--muted)',font:{size:11}}}},scales:{x:{ticks:{color:'var(--muted)',font:{size:11}},grid:{color:'rgba(255,255,255,0.04)'}},y:{ticks:{color:'var(--muted)'},grid:{color:'rgba(255,255,255,0.04)'}}}}
+  });
+}
+function renderHistChart() {
+  destroyChart('hist');
+  const ctx = document.getElementById('histChart').getContext('2d');
+  const today = new Date();
+  const days=[], vals=[];
+  for(let i=13;i>=0;i--){
+    const d=new Date(today); d.setDate(today.getDate()-i);
+    const dStr=d.toISOString().split('T')[0];
+    days.push(dStr.slice(5));
+    let present=0,total=0;
+    data.forEach(s=>{
+      const l=(s.log||[]).find(e=>e.date===dStr);
+      if(l){total++;if(l.status==='present')present++;}
+    });
+    vals.push(total>0?Math.round(present/total*100):null);
   }
-  render();
+  chartInsts['hist'] = new Chart(ctx,{
+    type:'line',
+    data:{labels:days,datasets:[{label:'Daily %',data:vals,borderColor:'#5b8df7',backgroundColor:'rgba(91,141,247,0.1)',tension:0.3,fill:true,pointBackgroundColor:'#5b8df7',pointRadius:4,spanGaps:true}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'var(--muted)',font:{size:11}},grid:{color:'rgba(255,255,255,0.04)'}},y:{min:0,max:100,ticks:{color:'var(--muted)',callback:v=>v+'%'},grid:{color:'rgba(255,255,255,0.04)'}}}}
+  });
+}
+function renderAnalyticsTable() {
+  const el = document.getElementById('analyticsTable');
+  if (!data.length) { el.innerHTML='<p class="text-muted">No data yet</p>'; return; }
+  const sorted=[...data].sort((a,b)=>pct(a)-pct(b));
+  el.innerHTML=`<table class="analytics-table">
+    <thead><tr><th>Subject</th><th>Attended</th><th>Total</th><th>%</th><th>Target</th><th>Can Miss / Need</th><th>Status</th></tr></thead>
+    <tbody>${sorted.map(s=>{
+      const p=pct(s).toFixed(1), t=getTarget(s), c=classify(s);
+      const msg=statusMsg(s);
+      const risk=c==='good'?'safe':c==='warn'?'warn':'crit';
+      return `<tr>
+        <td><strong>${s.name}</strong></td>
+        <td class="text-mono">${s.attended}</td>
+        <td class="text-mono">${s.total}</td>
+        <td class="text-mono" style="font-weight:700;color:${c==='good'?'var(--green)':c==='warn'?'var(--amber)':'var(--red)'}">${p}%</td>
+        <td class="text-mono">${t}%</td>
+        <td style="font-size:12px;color:var(--text2)">${msg.text}</td>
+        <td><span class="risk-chip risk-${risk}">${c==='good'?'Safe':c==='warn'?'Warning':'Critical'}</span></td>
+      </tr>`;
+    }).join('')}</tbody></table>`;
 }
 
-function toggleDark(){
-  document.body.classList.toggle("dark");
+// ─── NOTIFICATIONS ────────────────────────────────────
+function toggleNotif(key) {
+  notifSettings[key] = !notifSettings[key];
+  const el = document.getElementById(`toggle-${key}`);
+  el.classList.toggle('on', notifSettings[key]);
+  save(); renderAlerts();
+  if (key==='tt') renderMarkTab();
+}
+function updateWarnThresh(v) {
+  notifSettings.warnThresh=parseInt(v);
+  document.getElementById('warnThreshDisplay').textContent=v;
+  document.getElementById('warnThreshVal').textContent=v+'%';
+  save(); renderAlerts(); renderSubjects();
+}
+function renderAlerts() {
+  const el = document.getElementById('alertsList');
+  if (!notifSettings.risk) { el.innerHTML='<p class="text-muted">Risk alerts are disabled</p>'; return; }
+  const alerts = data.filter(s=>pct(s)<getTarget(s));
+  if (!alerts.length) { el.innerHTML='<div style="text-align:center;padding:24px;color:var(--green);font-weight:600;">🎉 All subjects are on track!</div>'; return; }
+  el.innerHTML = alerts.map(s=>{
+    const p=pct(s), t=getTarget(s), msg=statusMsg(s);
+    const cls=classify(s);
+    return `<div class="notif-row">
+      <div class="notif-icon">${cls==='warn'?'⚠️':'🚨'}</div>
+      <div>
+        <div class="notif-text" style="font-weight:600;">${s.name}</div>
+        <div class="notif-sub">${p.toFixed(1)}% / ${t}% target — ${msg.text}</div>
+      </div>
+      <span class="risk-chip ${cls==='warn'?'risk-warn':'risk-crit'}" style="margin-left:auto;flex-shrink:0;">${cls==='warn'?'Warning':'Critical'}</span>
+    </div>`;
+  }).join('');
+}
+function updateNotifBadge() {
+  const n = data.filter(s=>pct(s)<getTarget(s)).length;
+  const badge = document.getElementById('notifBadge');
+  badge.style.display = n>0?'inline':'none';
+  badge.textContent=n;
 }
 
-function changeTheme(t){
-  if(t==="purple"){
-    document.body.style.background="linear-gradient(135deg,#41295a,#2F0743)";
-  } else if(t==="dark"){
-    document.body.style.background="#000";
-  } else {
-    document.body.style.background="linear-gradient(135deg,#0f2027,#203a43,#2c5364)";
-  }
+// ─── TARGET MODAL ─────────────────────────────────────
+function saveTarget() {
+  globalTarget = parseInt(document.getElementById('targetSlider').value);
+  document.getElementById('targetDisplay').textContent=globalTarget;
+  save(); closeModal('targetModal'); renderSubjects();
+  toast(`Global target set to ${globalTarget}%`);
+}
+document.getElementById('targetSlider').value=globalTarget;
+document.getElementById('targetPrev').textContent=globalTarget+'%';
+document.getElementById('targetDisplay').textContent=globalTarget;
+
+// ─── TABS ─────────────────────────────────────────────
+const tabs = ['subjects','mark','timetable','analytics','notifications'];
+function switchTab(tab) {
+  document.querySelectorAll('.nav-tab').forEach((t,i)=>t.classList.toggle('active',tabs[i]===tab));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  if (tab==='mark') renderMarkTab();
+  if (tab==='analytics') renderAnalytics();
+  if (tab==='timetable') renderTimetable();
+  if (tab==='notifications') { renderAlerts(); document.getElementById('warnThreshSlider').value=notifSettings.warnThresh; document.getElementById('warnThreshDisplay').textContent=notifSettings.warnThresh; document.getElementById('warnThreshVal').textContent=notifSettings.warnThresh+'%'; document.getElementById('toggle-risk').classList.toggle('on',notifSettings.risk); document.getElementById('toggle-tt').classList.toggle('on',notifSettings.tt); }
 }
 
-function downloadJSON(){
-  const blob=new Blob([JSON.stringify(subjects)],{type:"application/json"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download="attendance.json";
-  a.click();
+// ─── EXPORT / IMPORT ──────────────────────────────────
+function exportCSV() {
+  let csv='Subject,Attended,Total,Percentage,Target\n';
+  data.forEach(s=>csv+=`"${s.name}",${s.attended},${s.total},${pct(s).toFixed(1)},${getTarget(s)}\n`);
+  dl(csv,'attendance.csv','text/csv');
+}
+function exportJSON() { dl(JSON.stringify({target:globalTarget,subjects:data,timetable},null,2),'attendance.json','application/json'); }
+function handleImport(e) {
+  const file=e.target.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try {
+      const p=JSON.parse(ev.target.result);
+      if(p.subjects){data=p.subjects;if(p.target)globalTarget=p.target;if(p.timetable)timetable=p.timetable;}
+      else if(Array.isArray(p)){data=p;}
+      save();renderSubjects();renderMarkTab();renderTimetable();
+      toast('Imported ✅');
+    } catch{toast('Invalid JSON','error');}
+  };
+  r.readAsText(file);
+}
+function dl(content,filename,type) {
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([content],{type}));
+  a.download=filename; a.click();
 }
 
-function downloadCSV(){
-  let csv="Subject,Attended,Total\n";
-  subjects.forEach(s=>csv+=`${s.name},${s.attended},${s.total}\n`);
-  const blob=new Blob([csv],{type:"text/csv"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download="attendance.csv";
-  a.click();
-}
-
-const nameInput=document.getElementById('name');
-const attendedInput=document.getElementById('attended');
-const totalInput=document.getElementById('total');
-const totalSub=document.getElementById('totalSub');
-const avgEl=document.getElementById('avg');
-const searchInput=document.getElementById('search');
-
-render();
+// ─── INIT ─────────────────────────────────────────────
+markDate = new Date().toISOString().split('T')[0];
+document.getElementById('markDate').value=markDate;
+updateDateDisplay();
+renderSubjects();
 </script>
-
 </body>
 </html>
