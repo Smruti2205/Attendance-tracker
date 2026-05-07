@@ -1,7 +1,7 @@
 # Attendance Tracking System
 
 ## Overview
-A DevOps-based Attendance Tracking System built using Node.js and basic web technologies. The project demonstrates the implementation of CI/CD pipelines, Docker containerization, automated testing, and deployment automation using GitHub Actions and Render.
+A modern attendance tracking web application built using Node.js, JavaScript, and DevOps practices. The project demonstrates CI/CD automation, Docker containerization, automated testing, and cloud deployment using GitHub Actions and Render.
 
 ---
 
@@ -13,12 +13,19 @@ This system provides a simple solution to monitor attendance and maintain attend
 ---
 
 ## Features
-- Attendance tracking interface
-- Backend server using Node.js
-- Automated test cases
+
+- Attendance percentage tracking
+- Subject-wise attendance analytics
+- Interactive charts and visual reports
+- Weekly timetable management
+- Attendance alerts and risk indicators
+- Theme customization (Dark, Light, Warm, Mint)
+- Automated testing with Jest
 - CI/CD pipeline using GitHub Actions
-- Docker containerization support
-- Cloud deployment integration
+- Docker containerization
+- Cloud deployment using Render
+- Data persistence using Local Storage
+- Import/Export attendance data
 
 ---
 
@@ -127,9 +134,9 @@ Workflow configuration files are located in:
 ## Deployment
 The application is deployed on Render with automatic deployment enabled through GitHub integration.
 
-Live URL:
+## Live Demo
 
-https://attendance-tracker-3b44.onrender.com/
+[Open Live Application](https://attendance-tracker-3b44.onrender.com/)
 
 ---
 
@@ -153,16 +160,19 @@ https://attendance-tracker-3b44.onrender.com/
 ---
 
 ## Future Improvements
-- Add MongoDB database integration
-- Implement authentication and authorization
-- Improve frontend UI/UX
-- Add attendance analytics dashboard
-- Deploy using cloud platforms such as AWS or Azure
+
+- MongoDB database integration
+- User authentication and authorization
+- Multi-user support
+- Real-time synchronization
+- Progressive Web App (PWA) support
+- AWS or Kubernetes deployment
 
 ---
 
 ## Conclusion
-This project demonstrates the implementation of a complete DevOps workflow integrating development, testing, automation, containerization, and deployment into a single pipeline.
+
+This project demonstrates a complete DevOps workflow integrating frontend development, automated testing, CI/CD pipelines, Docker containerization, and cloud deployment into a functional web application.
 
 ---
 
