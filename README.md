@@ -87,9 +87,7 @@ node server.js
 
 ### 4. Open in Browser
 
-```text
 http://localhost:3000
-```
 
 ---
 
