@@ -129,7 +129,7 @@ The application is deployed on Render with automatic deployment enabled through 
 
 Live URL:
 ```text
-https://attendance-tracker-zsj2.onrender.com
+https://attendance-tracker-3b44.onrender.com/
 ```
 
 ---
