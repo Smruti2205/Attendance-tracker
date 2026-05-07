@@ -128,9 +128,8 @@ Workflow configuration files are located in:
 The application is deployed on Render with automatic deployment enabled through GitHub integration.
 
 Live URL:
-```text
+
 https://attendance-tracker-3b44.onrender.com/
-```
 
 ---
 
